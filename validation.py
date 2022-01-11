@@ -1,5 +1,6 @@
 from typing import Optional, List
 from pydantic import BaseModel
+from pydantic.validators import UUID
 
 
 class DSNSettings(BaseModel):
@@ -23,3 +24,19 @@ class PostgresSettings(BaseModel):
 class Config(BaseModel):
     film_work_pg: PostgresSettings
 
+
+class Person(BaseModel):
+    id:UUID
+    name:str
+
+class FilmWork(BaseModel):
+    fw_id:UUID
+    imdb_rating:Optional[float]
+    genre: Optional[List[str]]
+    title:Optional[str]
+    description:Optional[str]
+    director:Optional[str]
+    actors_names: Optional[List[str]]
+    writers_names:Optional[List[str]]
+    actors:Optional[List[Person]]
+    writers:Optional[List[Person]]
