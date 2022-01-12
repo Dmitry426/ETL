@@ -1,9 +1,8 @@
 import psycopg2
-import json
 from psycopg2.extras import DictCursor
 
-from validation import Config, FilmWork
-
+from validation_classes import Config
+from data_merger import Data_Merger
 sql = """SELECT
     fw.id as film_id, 
     fw.title, 
@@ -30,40 +29,20 @@ with psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_conn:
     with pg_conn.cursor() as cursor:
         cursor.execute(sql)
         res = cursor.fetchall()
-        result = []
+        results = []
         film_id_counter = None
-        desired_structure = FilmWork
+        data_merger =Data_Merger()
         for item in res:
             fw = dict(item)
             if film_id_counter is None:
+                data_merger.combine_tables(obj=fw)
                 film_id_counter = fw['film_id']
-                desired_structure.parse_obj({
-                    "fw_id": fw['film_id'],
-                })
-                print(desired_structure.fw_id)
             if film_id_counter == fw['film_id']:
-                film_id_counter = fw['film_id']
-                if fw['role'] == 'director':
-                    desired_structure.parse_obj({'director':fw['full_name'],
-                                                 "genre": [fw['genre']]})
-                if fw['role'] == 'actor':
-                    desired_structure.parse_obj({'actors': [{'id':fw['person_id'],
-                                                            'name':fw['full_name']}],
-                                                    'actor_names':[fw['full_name']],
-                                                    "genre": [fw['genre']]}
-                                                )
-                if fw['role'] == 'director':
-                    desired_structure.parse_obj({'writers': [{'id':fw['person_id'],
-                                                             'name':fw['full_name']}],
-                                                    'writers_names':[fw['full_name']],
-                                                    "genre": [fw['genre']]}
-                                                )
+                data_merger.combine_tables(obj=fw)
             if film_id_counter != fw['film_id']:
+                result =data_merger.validate_and_return()
+                results.append(result)
+                data_merger.clean()
                 film_id_counter = fw['film_id']
-                result.append(desired_structure)
-                desired_structure = FilmWork
-                desired_structure.parse_obj({
-                    "id": fw['film_id'], "imdb_rating": fw['rating'],
-                    "genre": [fw['genre']], "title": fw['title'],
-                    "description": fw['description']
-                })
+                data_merger.combine_tables(obj=fw)
+    to_load = (results[0].dict())
