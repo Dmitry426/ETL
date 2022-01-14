@@ -1,6 +1,7 @@
 import abc
 import json
 from typing import Any, Optional
+from datetime import datetime
 
 
 class BaseStorage:
@@ -12,7 +13,7 @@ class BaseStorage:
     @abc.abstractmethod
     def retrieve_state(self) -> dict:
         with open(self.file_path, "r") as fp:
-            data = json.load(fp)
+            data = json.load(fp )
         return data
 
 
