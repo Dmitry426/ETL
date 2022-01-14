@@ -1,6 +1,7 @@
 from typing import Optional, List
-from pydantic import BaseModel
+from pydantic import BaseModel , validator
 from pydantic.validators import UUID
+from datetime import  datetime
 
 
 class DSNSettings(BaseModel):
@@ -28,6 +29,14 @@ class Config(BaseModel):
 class Person(BaseModel):
     id:UUID
     name:str
+
+class Datetime_serialization(BaseModel):
+        updated_at: datetime
+
+        class Config:
+            json_encoders = {
+                datetime: lambda v:datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
+            }
 
 class FilmWork(BaseModel):
     fw_id:UUID
