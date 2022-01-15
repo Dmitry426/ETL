@@ -1,5 +1,4 @@
-from validation_classes import FilmWork ,Datetime_serialization
-
+from validation_classes import FilmWork
 
 class Data_Merger:
     def __init__(self):
@@ -24,10 +23,6 @@ class Data_Merger:
         validated_result = FilmWork.parse_obj(self.desired_structure)
         self.empty_dataset()
         return validated_result
-    @staticmethod
-    def last_updated(updated_at:str):
-        updated_at = Datetime_serialization.parse_obj({"updated_at":updated_at})
-        return updated_at
 
     def merging_conditions(self, obj: dict):
         """Merging conditions for actors, directors and writes fields """
