@@ -1,8 +1,6 @@
 import abc
 import json
 from typing import Any, Optional
-from datetime import datetime
-
 
 class BaseStorage:
     @abc.abstractmethod
@@ -23,11 +21,6 @@ class JsonFileStorage(BaseStorage):
 
 
 class State:
-    """
-    Класс для хранения состояния при работе с данными, чтобы постоянно не перечитывать данные с начала.
-    Здесь представлена реализация с сохранением состояния в файл.
-    В целом ничего не мешает поменять это поведение на работу с БД или распределённым хранилищем.
-    """
     def __init__(self, storage: BaseStorage):
         self.storage = storage
 
