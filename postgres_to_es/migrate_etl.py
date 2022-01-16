@@ -6,13 +6,15 @@ from etl_uploader import Upload_batch
 
 config = Config.parse_file('config.json')
 dsl = dict(config.film_work_pg.dsl)
+
+
 def migrate_to_etl(connection):
     postgres_connection = connection
     postgres_loader = Load_data(config=config, connection_postgres=postgres_connection)
     loaded = postgres_loader.load_from_postgres()
     es = Upload_batch()
     es.push_index()
-
+    es.es_push_butch(data=loaded)
 
 
 
