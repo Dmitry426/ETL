@@ -3,7 +3,7 @@ from validation_classes import FilmWork
 class Data_Merger:
     def __init__(self):
         self.desired_structure = {
-            "fw_id": "", "imdb_rating": "",
+            "id": "", "imdb_rating": "",
             "genre": [], "title": "",
             "description": "", "director": "",
             "actors_names": [], "writers_names": [],
@@ -12,7 +12,7 @@ class Data_Merger:
 
     def combine_tables(self, obj: dict):
         """Merges multiple tables into one dict  """
-        self.desired_structure['fw_id'] = obj['film_id']
+        self.desired_structure['id'] = obj['film_id']
         self.desired_structure['imdb_rating'] = obj['rating']
         self.desired_structure['title'] = obj['title']
         self.desired_structure["description"] = obj['description']
@@ -26,6 +26,8 @@ class Data_Merger:
 
     def merging_conditions(self, obj: dict):
         """Merging conditions for actors, directors and writes fields """
+        if obj['genre'] not in self.desired_structure['genre']:
+            self.desired_structure['genre'].append(obj['genre'])
         if obj['role'] == "director" and obj["full_name"] != self.desired_structure["director"]:
             self.desired_structure['director'] = obj['full_name']
         if obj["role"] == "actor" and obj["full_name"] not in self.desired_structure["actors_names"]:
@@ -40,7 +42,7 @@ class Data_Merger:
     def empty_dataset(self):
         """ Method to empty merged dict"""
         self.desired_structure = {
-            "fw_id": "", "imdb_rating": "",
+            "id": "", "imdb_rating": "",
             "genre": [], "title": "",
             "description": "", "director": "",
             "actors_names": [], "writers_names": [],
