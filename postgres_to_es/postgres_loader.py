@@ -37,7 +37,7 @@ class Load_data:
             cursor.execute(query)
             response = cursor.fetchall()
             data_merger = Data_Merger()
-            for obj in response:
+            for obj in iter(response):
                 film = dict(obj)
                 if self.film_id_counter is None:
                     data_merger.combine_tables(obj=film)
@@ -46,7 +46,7 @@ class Load_data:
                     data_merger.combine_tables(obj=film)
                 if self.film_id_counter != film['film_id']:
                     result = data_merger.validate_and_return()
-                    self.results.append(result)
+                    self.results.append(result.dict())
                     self.film_id_counter = film['film_id']
                     data_merger.combine_tables(obj=film)
         return self.results
