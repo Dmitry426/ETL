@@ -2,6 +2,8 @@ from state_manager import State, JsonFileStorage
 from validation_classes import  Datetime_serialization
 
 class State_operator:
+    """Class to initialize state manger and validate 'updated_at' timestamp since json serializer
+    does not serialize  DateTimeField with Timestamp by default. """
     def __init__(self,config):
         self.config = config
         self.file_path = self.config.film_work_pg.state_file_path
