@@ -1,7 +1,6 @@
 from state_operator import State_operator
 from data_merger import Data_Merger
-
-
+import logging
 class Load_data:
     def __init__(self, connection_postgres, config):
         self.conn_postgres = connection_postgres
@@ -10,9 +9,9 @@ class Load_data:
         self.state = State_operator(config=self.config)
         self.parsed_state = None
         self.results = []
-        self.film_id_counter = None
 
-    def handle_no_date(self):
+    def _handle_no_date(self):
+        """Method to handle the case where we don't have recorded state yet."""
         limit = self.config.film_work_pg.limit
         if self.parsed_state['updated_at'] is None:
             sql_query_params = f""" 
@@ -28,25 +27,27 @@ class Load_data:
         """ % (self.parsed_state['updated_at'])
             return sql_query_params
 
+    def handle_merge_cases(self, query_data: list):
+        """Method to merge datatables by id ,since Data is requested using Left Joins  """
+        data_merger = Data_Merger()
+        for index,element in enumerate(query_data):
+            if index + 1 < len(query_data):
+                if element['film_id'] == query_data[index+1]['film_id']:
+                    data_merger.combine_tables(element)
+                    continue
+            data_merger.combine_tables(element)
+            result = data_merger.validate_and_return()
+            self.results.append(result.dict())
 
-    def load_from_postgres(self):
-        self.film_id_counter = None
-        with self.conn_postgres.cursor() as cursor:
-            self.parsed_state= self.state.validate_load_timestamp()
-            query = self.sql_query.format(self.handle_no_date())
-            cursor.execute(query)
-            response = cursor.fetchall()
-            data_merger = Data_Merger()
-            for obj in iter(response):
-                film = dict(obj)
-                if self.film_id_counter is None:
-                    data_merger.combine_tables(obj=film)
-                    self.film_id_counter = film['film_id']
-                if self.film_id_counter == film['film_id']:
-                    data_merger.combine_tables(obj=film)
-                if self.film_id_counter != film['film_id']:
-                    result = data_merger.validate_and_return()
-                    self.results.append(result.dict())
-                    self.film_id_counter = film['film_id']
-                    data_merger.combine_tables(obj=film)
         return self.results
+    def load_from_postgres(self):
+        """Simple postgres loader"""
+        try:
+            with self.conn_postgres.cursor() as cursor:
+                self.parsed_state = self.state.validate_load_timestamp()
+                query = self.sql_query.format(self._handle_no_date())
+                cursor.execute(query)
+                response = cursor.fetchall()
+        except  Exception as e :
+            logging.exception(e)
+        return response
