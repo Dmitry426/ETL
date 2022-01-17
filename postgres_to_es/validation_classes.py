@@ -1,5 +1,5 @@
 from typing import Optional, List
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from pydantic.validators import UUID
 from datetime import  datetime
 
@@ -35,13 +35,19 @@ class Datetime_serialization(BaseModel):
 
 
 class FilmWork(BaseModel):
-    fw_id:UUID
+    id:UUID
     imdb_rating:float = None
     genre: List[str]
-    title:str
+    title:str =None
     description:str = None
-    director:str = None
-    actors_names: List[str]
-    writers_names:List[str]
-    actors:List[Person]
-    writers:List[Person]
+    director:str =None
+    actors_names:Optional[List[str]]
+    writers_names:Optional[List[str]]
+    actors:Optional[List[Person]]
+    writers:Optional[List[Person]]
+
+    @validator('director', 'description', 'title')
+    def handle_empty_str(cls, variable: str) -> str:
+        if not variable:
+            return None
+        return variable
