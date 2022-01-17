@@ -16,15 +16,15 @@ class Data_Merger:
         self.desired_structure['imdb_rating'] = obj['rating']
         self.desired_structure['title'] = obj['title']
         self.desired_structure["description"] = obj['description']
-        self.merging_conditions(obj=obj)
+        self._merging_conditions(obj=obj)
 
     def validate_and_return(self):
         """Validates data and returns dataclass obj  """
         validated_result = FilmWork.parse_obj(self.desired_structure)
-        self.empty_dataset()
+        self._empty_dataset()
         return validated_result
 
-    def merging_conditions(self, obj: dict):
+    def _merging_conditions(self, obj: dict):
         """Merging conditions for actors, directors and writes fields """
         if obj['genre'] not in self.desired_structure['genre']:
             self.desired_structure['genre'].append(obj['genre'])
@@ -39,7 +39,7 @@ class Data_Merger:
             self.desired_structure["writers"].append({"id": obj['person_id'],
                                                       "name": obj["full_name"]})
 
-    def empty_dataset(self):
+    def _empty_dataset(self):
         """ Method to empty merged dict"""
         self.desired_structure = {
             "id": "", "imdb_rating": "",
