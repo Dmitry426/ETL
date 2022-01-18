@@ -3,6 +3,7 @@ from data_merger import Data_Merger
 import logging
 class Load_data:
     def __init__(self, connection_postgres, config):
+        self.logger = logging.getLogger('migrate_etl')
         self.conn_postgres = connection_postgres
         self.config = config
         self.sql_query = self.config.film_work_pg.sql_query
@@ -49,5 +50,5 @@ class Load_data:
                 cursor.execute(query)
                 response = cursor.fetchall()
         except  Exception as e :
-            logging.exception(e)
+            self.logger.exception(e)
         return response
