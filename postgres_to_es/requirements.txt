@@ -1,0 +1,9 @@
+bson==0.5.10
+certifi==2021.10.8
+elasticsearch==7.16.2
+psycopg2-binary==2.9.3
+pydantic==1.9.0
+python-dateutil==2.8.2
+six==1.16.0
+typing_extensions==4.0.1
+urllib3==1.26.8

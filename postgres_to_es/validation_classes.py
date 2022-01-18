@@ -20,6 +20,7 @@ class PostgresSettings(BaseModel):
     fetch_delay: Optional[float]
     state_file_path: Optional[str]
     sql_query: str
+    elastic_port:str
 
 
 class Config(BaseModel):
