@@ -2,7 +2,7 @@ from elasticsearch import Elasticsearch , ElasticsearchException
 from elasticsearch.helpers import  bulk
 import  json
 import logging
-import backoff
+
 class  Upload_batch:
     def __init__(self):
         self.es = Elasticsearch("http://localhost:9200")
