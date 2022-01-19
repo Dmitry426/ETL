@@ -1,7 +1,7 @@
 from typing import Optional, List
 from pydantic import BaseModel, validator
 from pydantic.validators import UUID
-from datetime import  datetime
+from datetime import datetime
 
 
 class DSNSettings(BaseModel):
@@ -19,8 +19,12 @@ class PostgresSettings(BaseModel):
     state_field: List[str]
     fetch_delay: Optional[float]
     state_file_path: Optional[str]
-    sql_query: str
-    elastic_port:str
+    sql_query_film_work: str
+    sql_query_person: str
+    sql_query_genre: str
+    sql_query_person_film_work: str
+    sql_query_genre_film_work: str
+    elastic_port: str
 
 
 class Config(BaseModel):
@@ -28,24 +32,25 @@ class Config(BaseModel):
 
 
 class Person(BaseModel):
-    id:UUID
-    name:str
+    id: UUID
+    name: str
+
 
 class Datetime_serialization(BaseModel):
-        updated_at: datetime = None
+    updated_at: datetime = None
 
 
 class FilmWork(BaseModel):
-    id:UUID
-    imdb_rating:float = None
+    id: UUID
+    imdb_rating: float = None
     genre: List[str]
-    title:str =None
-    description:str = None
-    director:str =None
-    actors_names:Optional[List[str]]
-    writers_names:Optional[List[str]]
-    actors:Optional[List[Person]]
-    writers:Optional[List[Person]]
+    title: str = None
+    description: str = None
+    director: str = None
+    actors_names: Optional[List[str]]
+    writers_names: Optional[List[str]]
+    actors: Optional[List[Person]]
+    writers: Optional[List[Person]]
 
     @validator('director', 'description', 'title')
     def handle_empty_str(cls, variable: str) -> str:
