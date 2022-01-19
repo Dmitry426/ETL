@@ -11,14 +11,12 @@ class BaseStorage:
     @abc.abstractmethod
     def retrieve_state(self) -> dict:
         with open(self.file_path, "r") as fp:
-            data = json.load(fp )
+            data = json.load(fp)
         return data
-
 
 class JsonFileStorage(BaseStorage):
     def __init__(self, file_path: Optional[str] = None):
         self.file_path = file_path
-
 
 class State:
     def __init__(self, storage: BaseStorage):
