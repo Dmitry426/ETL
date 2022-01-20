@@ -1,6 +1,6 @@
 import logging
 
-from psycopg2 import OperationalError
+from psycopg2 import OperationalError,DatabaseError
 
 from postgres_loader import Load_data
 from transform_data import Data_Merger
@@ -14,6 +14,7 @@ class Persons_etl_process:
         self.config = config.film_work_pg
         self.sql_query_persons = self.config.sql_query_persons
         self.sql_query_person_film_work = self.config.sql_query_person_film_work
+        self.sql_query_film_work_by_id = self.config.sql_query_film_work_by_id
         self.conn_postgres = postgres_connection
         self.state_field_name = 'persons_updated_at'
         self.transform_data = Data_Merger()
@@ -24,19 +25,25 @@ class Persons_etl_process:
         try:
             with self.conn_postgres.cursor() as cursor:
                 for loaded in iter(lambda: self.loader_process.postgres_producer(
-                                            cursor=cursor, query=self.sql_query_persons,
-                                            state_field_name=self.state_field_name), []):
+                                                                cursor=cursor, query=self.sql_query_persons,
+                                                                state_field_name=self.state_field_name
+                                                                ), []):
                     person_ids = (res['id'] for res in loaded)
-                    fw_ids=  self.loader_process.postgres_enricher(cursor=cursor, ids=person_ids,
-                                                          query=self.sql_query_person_film_work
-                                                          )
+                    fw_ids=  self.loader_process.postgres_enricher(
+                                                                    cursor=cursor, ids=person_ids,
+                                                                    query=self.sql_query_person_film_work
+                                                                  )
+                    merged_film_work= self.loader_process.postgres_merger(
+                                                                      cursor=cursor,ids=fw_ids,
+                                                                      query=self.sql_query_film_work_by_id
+                                                                      )
+                    parsed_data = self.transform_data.handle_merge_cases(query_data=merged_film_work)
+                    es = Upload_batch()
+                    es.es_push_butch(data=parsed_data)
+                    self.state.validate_save_timestamp(
+                                                        state_field_name=self.state_field_name,
+                                                        timestamp=loaded[-1]['updated_at']
+                                                       )
 
-                    # parsed_data = self.transform_data.handle_merge_cases(query_data=loaded)
-                    # es = Upload_batch()
-                    # es.es_push_butch(data=parsed_data)
-                    # self.state.validate_save_timestamp(state_field_name='film_work_updated_at',
-                    #                                     timestamp=loaded[-1]['updated_at']
-                    #                                     )
-
-        except OperationalError as e:
+        except (OperationalError, DatabaseError) as e:
             self.logger.exception(e)
