@@ -3,28 +3,26 @@ import logging
 import psycopg2
 from psycopg2.extras import DictCursor
 
-from postgres_loader import Load_data
 from validation_classes import Config
-from etl_uploader import Upload_batch
-from state_operator import State_operator
-
+from film_work_process import Film_work_etl_process
+from persons_process import Persons_etl_process
+from genres_process import  Genres_etl_process
 config = Config.parse_file('config.json')
 dsl = dict(config.film_work_pg.dsl)
+
 
 def load_loger():
     logging.basicConfig(filename='es.log', filemode='w',
                         format='%(name)s - %(levelname)s - %(message)s')
 
-def migrate_to_etl(connection):
-    state = State_operator(config)
-    postgres_connection = connection
-    postgres_loader = Load_data(config=config, connection_postgres=postgres_connection)
-    for loaded in iter(lambda: postgres_loader.load_from_postgres(), []):
-        parsed_data = postgres_loader.handle_merge_cases(query_data=loaded)
-        es = Upload_batch()
-        es.es_push_butch(data=parsed_data)
-        state.validate_save_timestamp(loaded[-1]['updated_at'])
 
+def migrate_to_etl(connection):
+    film_work_to_es = Film_work_etl_process(config=config, postgres_connection=connection)
+    film_work_to_es.migrate_film_work()
+    film_work_to_es_by_person = Persons_etl_process(config=config, postgres_connection=connection)
+    film_work_to_es_by_person.migrate_film_work()
+    film_work_to_es_by_genre = Genres_etl_process(config=config, postgres_connection=connection)
+    film_work_to_es_by_genre.migrate_film_work()
 
 if __name__ == '__main__':
     load_loger()
