@@ -9,6 +9,7 @@ class Data_Merger:
             "actors_names": [], "writers_names": [],
             "writers": [], "actors": [],
         }
+        self.results =[]
 
     def combine_tables(self, obj: dict):
         """Merges multiple tables into one dict  """
@@ -23,6 +24,19 @@ class Data_Merger:
         validated_result = FilmWork.parse_obj(self.desired_structure)
         self._empty_dataset()
         return validated_result
+
+    def handle_merge_cases(self, query_data: list):
+        """Method to merge datatables by id ,since Data is requested using Left Joins  """
+        for index, element in enumerate(query_data):
+            if index + 1 < len(query_data):
+                if element['film_id'] == query_data[index + 1]['film_id']:
+                    self.combine_tables(element)
+                    continue
+            self.combine_tables(element)
+            result = self.validate_and_return()
+            self.results.append(result.dict())
+
+        return self.results
 
     def _merging_conditions(self, obj: dict):
         """Merging conditions for actors, directors and writes fields """
@@ -48,3 +62,7 @@ class Data_Merger:
             "actors_names": [], "writers_names": [],
             "writers": [], "actors": [],
         }
+
+
+
+
