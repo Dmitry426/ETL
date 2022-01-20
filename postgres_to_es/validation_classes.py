@@ -15,15 +15,17 @@ class DSNSettings(BaseModel):
 class PostgresSettings(BaseModel):
     dsl: DSNSettings
     limit: Optional[int]
-    order_field: List[str]
-    state_field: List[str]
+    film_work_state_field: str
+    genres_state_field:str
+    persons_state_field:str
     fetch_delay: Optional[float]
     state_file_path: Optional[str]
-    sql_query_film_work: str
-    sql_query_person: str
-    sql_query_genre: str
+    sql_query_film_work_by_id: str
+    sql_query_persons: str
+    sql_query_genres: str
     sql_query_person_film_work: str
     sql_query_genre_film_work: str
+    sql_query_film_work_by_updated_at:str
     elastic_port: str
 
 
@@ -37,8 +39,9 @@ class Person(BaseModel):
 
 
 class Datetime_serialization(BaseModel):
-    updated_at: datetime = None
-
+    persons_updated_at: Optional[datetime] = None
+    genres_updated_at: Optional[datetime] = None
+    film_work_updated_at: Optional[datetime] = None
 
 class FilmWork(BaseModel):
     id: UUID
