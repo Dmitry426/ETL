@@ -11,9 +11,8 @@ env?
 .idea
 .tox
 .vscode/
-/rel
-/wheels
-/packages
-/__pycache__/
-state/
+rel
+wheels
+packages
+__pycache__/
 etl_index/
