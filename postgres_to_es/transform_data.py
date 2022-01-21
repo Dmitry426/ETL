@@ -9,7 +9,7 @@ class Data_Merger:
             "actors_names": [], "writers_names": [],
             "writers": [], "actors": [],
         }
-        self.results =[]
+        self.results = []
 
     def combine_tables(self, obj: dict):
         """Merges multiple tables into one dict  """
@@ -52,7 +52,6 @@ class Data_Merger:
             self.desired_structure["writers_names"].append(obj["full_name"]),
             self.desired_structure["writers"].append({"id": obj['person_id'],
                                                       "name": obj["full_name"]})
-
     def _empty_dataset(self):
         """ Method to empty merged dict"""
         self.desired_structure = {
@@ -62,7 +61,3 @@ class Data_Merger:
             "actors_names": [], "writers_names": [],
             "writers": [], "actors": [],
         }
-
-
-
-
