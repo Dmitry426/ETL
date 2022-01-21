@@ -17,3 +17,5 @@ ENV APP_HOME=/home/postgres_to_es/
 WORKDIR $APP_HOME
 
 COPY . .
+
+CMD ["python"  , "migrate_etl.py"]
