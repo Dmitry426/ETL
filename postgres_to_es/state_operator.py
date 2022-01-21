@@ -2,6 +2,7 @@ from validation_classes import  Datetime_serialization
 import abc
 import json
 from typing import Any, Optional
+import os.path
 
 class BaseStorage:
     @abc.abstractmethod
@@ -11,9 +12,13 @@ class BaseStorage:
 
     @abc.abstractmethod
     def retrieve_state(self) -> dict:
-        with open(self.file_path, "r") as fp:
-            data = json.load(fp)
-        return data
+        try:
+            with open(self.file_path, "r") as fp:
+                data = json.load(fp)
+            return data
+        except FileNotFoundError:
+            self.save_state(state={})
+            return {}
 
 class JsonFileStorage(BaseStorage):
     def __init__(self, file_path: Optional[str] = None):
