@@ -5,4 +5,4 @@ Dockerfile
 README.md
 venv
 .idea
-.env
+__pycache__/
