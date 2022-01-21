@@ -1,5 +1,5 @@
 import logging
-
+import backoff
 from psycopg2 import OperationalError,DatabaseError
 
 from postgres_loader import Load_data
@@ -16,11 +16,12 @@ class Persons_etl_process:
         self.sql_query_person_film_work = self.config.sql_query_person_film_work
         self.sql_query_film_work_by_id = self.config.sql_query_film_work_by_id
         self.conn_postgres = postgres_connection
-        self.state_field_name = 'persons_updated_at'
+        self.state_field_name = self.config.persons_state_field
         self.transform_data = Data_Merger()
         self.state = State_operator(config)
         self.logger = logging.getLogger('migrate_etl')
 
+    @backoff.on_exception(backoff.expo, OperationalError,  max_time=60)
     def migrate_film_work(self):
         try:
             with self.conn_postgres.cursor() as cursor:
@@ -38,12 +39,12 @@ class Persons_etl_process:
                                                                       query=self.sql_query_film_work_by_id
                                                                       )
                     parsed_data = self.transform_data.handle_merge_cases(query_data=merged_film_work)
-                    es = Upload_batch()
+                    es = Upload_batch(config=self.config)
                     es.es_push_butch(data=parsed_data)
                     self.state.validate_save_timestamp(
                                                         state_field_name=self.state_field_name,
                                                         timestamp=loaded[-1]['updated_at']
                                                        )
-
+                self.conn_postgres.commit()
         except (OperationalError, DatabaseError) as e:
             self.logger.exception(e)
