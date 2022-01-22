@@ -7,7 +7,7 @@
 ### Current revision fixes 
    <s>pep8 full compliance</s><br>
    <del> code revision and uptimizations</s><br>
-   <del>Simple schedule script to  run outomigation with interval</del><br>
+   <del>Simple schedule script to  run outomation with interval</del><br>
    <del> Bug fixes</del><br>
 ### TODO
   - optimize postgres data load process (to filter loaded ids so data is not loaded 2 times  )
