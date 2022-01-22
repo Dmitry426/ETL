@@ -5,16 +5,18 @@ from pydantic import BaseModel, validator
 from pydantic.validators import UUID
 from pydantic import BaseSettings, Field
 
+
 class DSNSettings(BaseSettings):
-    host: str = Field(..., env='POSTGRES_HOST')
-    port: str = Field(..., env='POSTGRES_PORT')
-    dbname: str = Field(..., env='POSTGRES_DB')
-    password: str = Field(..., env='POSTGRES_PASSWORD')
+    host: str = Field(..., env="POSTGRES_HOST")
+    port: str = Field(..., env="POSTGRES_PORT")
+    dbname: str = Field(..., env="POSTGRES_DB")
+    password: str = Field(..., env="POSTGRES_PASSWORD")
     user: str = Field(..., env="POSTGRES_USER")
 
     class Config:
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+
 
 class PostgresSettings(BaseModel):
     limit: Optional[int]
@@ -30,17 +32,21 @@ class PostgresSettings(BaseModel):
     sql_query_film_work_by_updated_at: str
     elastic_port: str
 
+
 class Config(BaseModel):
     film_work_pg: PostgresSettings
+
 
 class Person(BaseModel):
     id: UUID
     name: str
 
+
 class Datetime_serialization(BaseModel):
     persons_updated_at: Optional[datetime] = None
     genres_updated_at: Optional[datetime] = None
     film_work_updated_at: Optional[datetime] = None
+
 
 class FilmWork(BaseModel):
     id: UUID
@@ -54,7 +60,7 @@ class FilmWork(BaseModel):
     actors: Optional[List[Person]]
     writers: Optional[List[Person]]
 
-    @validator('director', 'description', 'title')
+    @validator("director", "description", "title")
     def handle_empty_str(cls, variable: str) -> str:
         if not variable:
             return None
