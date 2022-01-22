@@ -2,36 +2,32 @@ from validation_classes import  Datetime_serialization
 import abc
 import json
 from typing import Any, Optional
-import os.path
 
 class BaseStorage:
     @abc.abstractmethod
-    def save_state(self, state: dict) -> None:
-        with open(self.file_path, 'w') as fp:
+    def save_state(self, state: dict ,file_path) -> None:
+        with open(file_path, 'w') as fp:
             json.dump(state, fp)
 
     @abc.abstractmethod
-    def retrieve_state(self) -> dict:
+    def retrieve_state(self, file_path) -> dict:
         try:
-            with open(self.file_path, "r") as fp:
+            with open(file_path, "r") as fp:
                 data = json.load(fp)
             return data
         except FileNotFoundError:
             self.save_state(state={})
             return {}
 
-class JsonFileStorage(BaseStorage):
-    def __init__(self, file_path: Optional[str] = None):
+class State:
+    def __init__(self, storage: BaseStorage, file_path: Optional[str] = None):
+        self.storage = storage
         self.file_path = file_path
 
-class State:
-    def __init__(self, storage: BaseStorage):
-        self.storage = storage
-
     def set_state(self, key: str, value: Any) -> None:
-        load = self.storage.retrieve_state()
+        load = self.storage.retrieve_state(file_path=self.file_path)
         load[key] = value
-        self.storage.save_state(load)
+        self.storage.save_state(load,file_path=self.file_path)
 
     def get_state(self, key: str) -> Any:
         result = self.storage.retrieve_state()
