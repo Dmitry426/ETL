@@ -11,7 +11,7 @@
    <del> Bug fixes</del><br>
 ### TODO
   - optimize postgres data load process (to filter loaded ids so data is not loaded 2 times  )
-  - from simple schedule script move to cron orc celery in order to run in container properly
+  - from simple schedule script move to cron or celery in order to run in container properly
   - run migration process using docker-compose
 
 
