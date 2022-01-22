@@ -5,7 +5,7 @@
 - Migration devided into 3 separete processes each can be run separately
 - Each process film_work , genres , persons  migrates data to ELT by last updated_at field 
 ### Current revision fixes 
-     ~~ pep8 full compliance ~~
+     ~~pep8 full compliance~~
      ~~ code revision and uptimizations ~~ 
      ~~ Simple schedule script to  run outomigation with interval ~~ 
      ~~  Bug fixes ~~ 
