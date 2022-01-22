@@ -7,37 +7,70 @@ from dotenv import load_dotenv
 from psycopg2 import OperationalError
 
 from validation_classes import Config, DSNSettings
-from film_work_process import Film_work_etl_process
-from persons_process import Persons_etl_process
-from genres_process import Genres_etl_process
+from migration_process import FilmWorkProcess, PersonGenreProcess
+import schedule
+import time
 
-config = Config.parse_file('config.json')
+config = Config.parse_file("config.json")
+fw_config = config.film_work_pg
+sql_query_film_work = fw_config.sql_query_film_work_by_updated_at
+sql_query_persons = fw_config.sql_query_persons
+sql_query_person_film_work = fw_config.sql_query_person_film_work
+sql_query_genres = fw_config.sql_query_genres
+sql_query_genre_film_work = fw_config.sql_query_genre_film_work
+film_work_state_field = fw_config.film_work_state_field
+genres_state_field = fw_config.genres_state_field
+persons_state_field = fw_config.persons_state_field
+
 load_dotenv()
 dsl = DSNSettings().dict()
 
 
 def load_loger():
-    logging.basicConfig(filename='es.log', filemode='w',
-                        format='%(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(
+        filename="es.log", filemode="w", format="%(name)s - %(levelname)s - %(message)s"
+    )
+
+
+def migration_cycle(interval_min: int, func) -> object:
+    schedule.every(interval_min).minutes.do(func)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
 
 @backoff.on_exception(backoff.expo, OperationalError, max_time=60)
 def migrate_to_etl():
     with psycopg2.connect(**dsl, cursor_factory=DictCursor) as connection:
-        film_work_to_es = Film_work_etl_process(
-            config=config, postgres_connection=connection)
-        film_work_to_es.migrate_film_work()
-        film_work_to_es_by_person = Persons_etl_process(
-            config=config, postgres_connection=connection)
-        film_work_to_es_by_person.migrate_film_work()
-        film_work_to_es_by_genre = Genres_etl_process(
-            config=config, postgres_connection=connection)
-        film_work_to_es_by_genre.migrate_film_work()
+        film_work_to_es = FilmWorkProcess(
+            config=fw_config, postgres_connection=connection
+        )
+
+        film_work_to_es.migrate_film_work(
+            film_work_query=sql_query_film_work, state_filed_name=film_work_state_field
+        )
+
+        genres_persons_to_es = PersonGenreProcess(
+            config=fw_config, postgres_connection=connection
+        )
+        genres_persons_to_es.migrate_genre_person(
+            person_or_genre_query=sql_query_genres,
+            person_genre_fw_query=sql_query_genre_film_work,
+            state_filed_name=genres_state_field,
+        )
+        genres_persons_to_es.migrate_genre_person(
+            person_or_genre_query=sql_query_persons,
+            person_genre_fw_query=sql_query_person_film_work,
+            state_filed_name=persons_state_field,
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     load_loger()
     try:
-        migrate_to_etl()
+        schedule.every(1).minutes.do(migrate_to_etl)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
     except psycopg2.OperationalError as e:
         logging.error(e)
