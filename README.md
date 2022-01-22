@@ -4,6 +4,15 @@
      but you can run postges and etl container from dcoker compose as for now . Only ETL transform process HAVE to be run maually  "Working on it "   
 - Migration devided into 3 separete processes each can be run separately
 - Each process film_work , genres , persons  migrates data to ELT by last updated_at field 
+### Current revision fixes 
+     ~~ pep8 full compliance ~~
+     ~~ code revision and uptimizations ~~ 
+     ~~ Simple schedule script to  run outomigation with interval ~~ 
+     ~~  Bug fixes ~~ 
+### TODO
+  - optimize postgres data load process (to filter loaded ids so data is not loaded 2 times  )
+  - from simple schedule script move to cron orc celery in order to run in container properly
+  - run migration process using docker-compose
 
 
 ## Minimum Requirements
