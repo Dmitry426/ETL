@@ -21,7 +21,7 @@ This project supports Ubuntu Linux 18.04  It is not tested or supported for the 
 - [Docker 20.10 +](https://docs.docker.com/)
 - [docker-compose  1.29.2 + ](https://docs.docker.com/compose/)
 - [elasticsearch 7.16.2 + ]  (https://elasticsearch-py.readthedocs.io/en/v7.16.2/)
-- [psycopg2-binary 2.9.3]  (https://pypi.org/project/psycopg2-binary/)
+- [psycopg2-binary 2.9.3 ]  (https://pypi.org/project/psycopg2-binary/)
 
 
  # You can start migration by Runnig this commands . 
