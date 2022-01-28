@@ -10,8 +10,6 @@ from elasticsearch import ConnectionError
 class Upload_batch:
     def __init__(self, config):
         self.config = config
-        self.host = "es01"
-        self.port = "9200"
         self.es = Elasticsearch(self.config.elastic_port)
         self.logger = logging.getLogger("migrate_etl")
         self.request_body = None
