@@ -25,19 +25,10 @@ persons_state_field = fw_config.persons_state_field
 load_dotenv()
 dsl = DSNSettings().dict()
 
-
 def load_loger():
     logging.basicConfig(
         filename="es.log", filemode="w", format="%(name)s - %(levelname)s - %(message)s"
     )
-
-
-def migration_cycle(interval_min: int, func) -> object:
-    schedule.every(interval_min).minutes.do(func)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
 
 @backoff.on_exception(backoff.expo, OperationalError, max_time=60)
 def migrate_to_etl():
