@@ -1,8 +1,8 @@
 services:
 
-  migration:
+  etl:
     build: ./postgres_to_es
-    depends_on:
+    links:
       - postgres
 
   postgres:
@@ -12,9 +12,9 @@ services:
     env_file:
       - ./.env
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_NAME}
     ports:
       - 5432:5432
     restart: always
