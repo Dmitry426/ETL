@@ -1,4 +1,4 @@
-## ETL mogration for Yandex practicum .
+## ETL migration process .
 
 - As for now project can't be run from the container,
      but you can run postges and etl container from dcoker compose as for now . Only ETL transform process HAVE to be run maually  "Working on it "   
@@ -9,14 +9,10 @@
    <del> code revision and uptimizations</s><br>
    <del>Simple schedule script to  run outomation with interval</del><br>
    <del> Bug fixes</del><br>
-### TODO
-  - optimize postgres data load process (to filter loaded ids so data is not loaded 2 times  )
-  - from simple schedule script move to cron or celery in order to run in container properly
-  - run migration process using docker-compose
 
 
 ## Minimum Requirements
-This project supports Ubuntu Linux 18.04  It is not tested or supported for the Windows OS.
+This project supports Ubuntu Linux 18.04  
 
 - [Docker 20.10 +](https://docs.docker.com/)
 - [docker-compose  1.29.2 + ](https://docs.docker.com/compose/)
@@ -30,7 +26,6 @@ This project supports Ubuntu Linux 18.04  It is not tested or supported for the 
 
 ```bash
 $ docker-compose up -d  --bulid 
-$ python3 migrate_etl.py
 
 
 ```
@@ -53,7 +48,5 @@ $ sudo docker run -p 9200:9200 -e "discovery.type=single-node" docker.elastic.co
 
 ```
 # Notes 
-- Config validation through pydantic 
-- By default exponentioal backoff max_time=60  
-- Loger logs all conection erros to  a separate es.log file 
-- Etl index automatically uploaded from index.json on first migration if not exist
+- Config validation through pydantic
+- Loger logs all everything  to  a separate es.log  volume .. So  you can mount this logging volume to Filebit
