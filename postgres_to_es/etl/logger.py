@@ -1,6 +1,3 @@
-__all__ = "logger"
-
-import logging.config
 import os
 
 log_path = os.path.join("/", "src/logs/postgres_to_es.json")
@@ -29,5 +26,4 @@ LOGGING = {
     'root': {'level': 'INFO', 'handlers': ['console', ], },
 }
 
-logging.config.dictConfig(LOGGING)
-logger = logging.getLogger("etl")
+
